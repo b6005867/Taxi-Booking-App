@@ -1,0 +1,10 @@
+<div class="card" ng-app="quoteApp">
+    <div class="card-body">
+        <blockquote class="blockquote mb-0">
+        <!-- Decode the string and show the quote -->
+        <p>{{decodeHTML(quote[0].content)}}</p>
+        <!-- Decode the string and show who said it -->
+        <footer class="blockquote-footer"><cite title="Source Title">{{decodeHTML(quote[0].title)}}</cite></footer>
+        </blockquote>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="card" style="width: 100%;" ng-app="loginApp">
+    <div class="card-body">
+        <h5 class="card-title">Login</h5>
+        <h6 ng-show="loginFailed == 1">Sorry, your credentials appear to be incorrect. :(</h4>
+        <br>
+        <form name="loginForm" id="loginForm">
+            <table class="text-center" style="width:100%">
+                <tr>
+                    <td>Username:</td>
+                    <td><input type="text" name="" id="us" ng-model="enteredUsername" ng-pattern="/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/" required></td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input type="password" name="" id="ps" ng-model="enteredPassword" required></td>
+                </tr>
+            </table>
+        </form>
+        <br>
+        <button type="button" class="btn btn-primary" ng-disabled="loginForm.$invalid" ng-click="login(enteredUsername,enteredPassword)">Go!</button>
+    </div>
+</div>

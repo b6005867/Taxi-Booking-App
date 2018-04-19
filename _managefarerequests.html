@@ -1,0 +1,150 @@
+<div class="card" ng-app="manageRequestsApp">
+    <div class="card-body">
+        <!-- Clean the data and calculate the number in the blue pill -->
+        <h5 class="card-title">Manage Fare Requests {{cleanData()}}  <span class="badge badge-primary badge-pill">{{returnArrayLenght(bookings)}}</span></h5>
+        <p class="card-text">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th>Full Name</th>
+                        <th>Pick-up Address</th>
+                        <th>No. Of Passengers</th>
+                        <th>Destination Address</th>
+                        <th>Driver Name</th>
+                        <!--<th>Car Registration</th>-->
+                        <th ng-show="isBookingEditing != 0">Assign Driver</th>
+                        <th ng-show="managerButtons == 1">Edit</th>
+                        <th ng-show="managerButtons == 1 && isBookingEditing == 0">Delete</th>
+                    </tr>
+                    <tr ng-repeat="booking in bookings">
+                            
+                        <td ng-show="isBookingEditing != booking.Id">{{booking.PassengerName}}</td>
+                        <td ng-show="isBookingEditing == booking.Id && managerButtons == 1">{{booking.PassengerName}}</td>
+                        <td ng-show="isBookingEditing != booking.Id">{{booking.PickupLocation}}</td>
+                        <td ng-show="isBookingEditing == booking.Id && managerButtons == 1"><input type="text" ng-model="booking.PickupLocation" style='width:100%;' ></td>
+                        <td ng-show="isBookingEditing != booking.Id">{{booking.CurrentPassenger}}</td>
+                        <td ng-show="isBookingEditing == booking.Id && managerButtons == 1"><input type="number" ng-model="booking.CurrentPassenger" style='width:100px;' ></td>
+                        <td ng-show="isBookingEditing != booking.Id">{{booking.DropOffLocation}}</td>
+                        <td ng-show="isBookingEditing == booking.Id && managerButtons == 1"><input type="text" ng-model="booking.DropOffLocation" style='width:100%;' ></td>
+                        <td>{{getTaxiName(booking.VehicleId)}}</td>
+                        <!--<td>{{getTaxiRegistration(booking.VehicleId)}}</td>-->
+
+                        <td ng-show="managerButtons == 1 && isBookingEditing == booking.Id"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#assignDriver">Assign Driver</button></td>
+                        <td ng-show="managerButtons == 1 && isBookingEditing != 0 && isBookingEditing != booking.Id"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#assignDriver" disabled>Assign Driver</button></td>
+                        
+                        <td ng-show="managerButtons == 1 && isBookingEditing != booking.Id"><button type="button" class="btn btn-primary" ng-click="editBookings(booking.Id)">Edit</button></td>
+                        <td ng-show="managerButtons == 1 && isBookingEditing == booking.Id"><button type="button" class="btn btn-primary" ng-click="saveBookingChanges(booking.CurrentPassenger,booking.DropOffLocation,booking.Id,booking.PassengerName,booking.PickupLocation,booking.VehicleId)">Save</button></td>
+
+                        <td ng-show="managerButtons == 1 && isBookingEditing == 0"><button type="button" class="btn btn-danger" ng-click="deleteBooking(booking.Id)">Delete</button></td>
+                    </tr>
+                </table>
+            </div>
+            <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addFare">Add New Fare</button></td>
+
+
+            <!-- Add Modal -->
+            <div class="modal fade" id="addFare" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-md" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Active Taxis</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="emptyForm(3)">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form name="addBookingForm" id="addBookingForm">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <tr>
+                                                    <td>Name</td>
+                                                    <td>
+                                                        <input type="text" name="addBookingPassenger" ng-model="passengername" ng-pattern="/^[a-z ,.'-]+$/i"  required>
+                                                        <span ng-show="addBookingForm.addBookingPassenger.$error.required"><br>Passenger name route is required<br></span>
+                                                        <span ng-show="addBookingForm.addBookingPassenger.$error.pattern"><br>You have entered an invalid Passenger name <br></span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pickup Location</td>
+                                                    <td>
+                                                        <input type="text" name="addBookingPickupLocation" ng-model="pickuplocation" ng-pattern="/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/" required>
+                                                        <span ng-show="addBookingForm.addBookingPickupLocation.$error.required"><br>Pickup Location is required<br></span>
+                                                        <span ng-show="addBookingForm.addBookingPickupLocation.$error.pattern"><br>You have entered an invalid Pickup Location <br></span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Drop-Off Location</td>
+                                                    <td>
+                                                        <input type="text" name="addBookingDropoffLocation" ng-model="dropofflocation" ng-pattern="/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/" required>
+                                                        <span ng-show="addBookingForm.addBookingDropoffLocation.$error.required"><br>Drop-Off locaiton is required<br></span>
+                                                        <span ng-show="addBookingForm.addBookingDropoffLocation.$error.pattern"><br>You have entered an invalid Drop-Off locaiton <br></span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Number Of Passengers</td>
+                                                    <td>
+                                                        <input type="number" name="addBookingNoOfPassengers" ng-model="currentpassenger" ng-pattern="/^[0-9]*$/" required>
+                                                        <span ng-show="addBookingForm.addBookingNoOfPassengers.$error.required"><br>Number of Passengers is required<br></span>
+                                                        <span ng-show="addBookingForm.addBookingNoOfPassengers.$error.pattern"><br>You have entered an invalid Number of Passengers<br></span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Assign Driver</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr ng-repeat="taxi in taxis">
+                                                    <input type="hidden" ng-model="isDriverAssigned" required>
+                                                    <!-- only display if enough seats available -->
+                                                    <td ng-show="(getTaxiCurrentPassengers(taxi.Id) + currentpassenger) <= taxi.Capacity">{{taxi.Driver}}</td>
+                                                    <td ng-show="(getTaxiCurrentPassengers(taxi.Id) + currentpassenger) <= taxi.Capacity"><button type="button" class="btn btn-primary" ng-click="setBookingTaxi(taxi.Id)">Assign</button></td>
+                                                </tr> 
+                                            </table>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" ng-disabled="addBookingForm.$invalid" ng-click="addBooking(currentpassenger,dropofflocation,passengername,pickuplocation,setDriverId)" data-dismiss="modal">Add Booking</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="emptyForm(3)">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assign Driver Modal -->
+            <div class="modal fade" id="assignDriver" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-md" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Active Taxis</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form>
+                                        <table class="table">
+                                            <tr ng-repeat="taxi in taxis">
+                                                <td ng-show="(getTaxiCurrentPassengers(taxi.Id) + getBookingCurrentPassengers(isBookingEditing)) <= taxi.Capacity">{{taxi.Driver}}</td>
+                                                <td ng-show="(getTaxiCurrentPassengers(taxi.Id) + getBookingCurrentPassengers(isBookingEditing)) <= taxi.Capacity"><button type="button" class="btn btn-primary" ng-click="assignTaxiToBooking(isBookingEditing,taxi.Id)" data-dismiss="modal">Assign</button></td>
+                                            </tr> 
+                                        </table>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="emptyForm(3)">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </p>
+    </div>
+</div>

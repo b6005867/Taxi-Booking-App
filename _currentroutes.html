@@ -1,0 +1,107 @@
+<div class="card" ng-app="activeRoutesApp">
+    <div class="card-body">
+        <!-- Calculate the number in the blue pill -->
+        <h5 class="card-title">Current Routes  <span class="badge badge-primary badge-pill">{{returnArrayLenght(routes)}}</span></h5>
+        <p class="card-text">
+            <ul>
+                <li class="text-success" ng-repeat="route in routes">{{route.RouteStartPoint}} - {{route.RouteEndPoint}}</li>
+            </ul>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#routeDetailsModal">Details</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addRouteModal" ng-show="managerButtons == 1">Add A Route</button>
+            
+            <!-- Modal with detailed view of the routes -->
+                <div class="modal fade" id="routeDetailsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Active Taxis</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table class="table">
+                                                <!-- Show the table of routes -->
+                                                <tr>
+                                                    <th>Route Start Point</th>
+                                                    <th>Route End point</th>
+                                                    <th ng-show="managerButtons == 1">Edit</th>
+                                                    <th ng-show="managerButtons == 1">Delete</th>
+                                                </tr>
+                                                <tr ng-repeat="route in routes" class="text-success">
+
+                                                    <td ng-show="isRouteEditing != route.Id">{{route.RouteStartPoint}}</td>
+                                                    <td ng-show="isRouteEditing == route.Id && managerButtons == 1"><input type="text" ng-model="route.RouteStartPoint" style='width:100%;'></td>
+                                                    <td ng-show="isRouteEditing != route.Id">{{route.RouteEndPoint}}</td>
+                                                    <td ng-show="isRouteEditing == route.Id && managerButtons == 1"><input type="text" ng-model="route.RouteEndPoint" style='width:100%;'></td>
+
+                                                    <td ng-show="managerButtons == 1 && isRouteEditing != route.Id"><button type="button" class="btn btn-primary" ng-click="editRoute(route.Id)">Edit</button></td>
+                                                    <td ng-show="managerButtons == 1 && isRouteEditing == route.Id"><button type="button" class="btn btn-primary" ng-click="saveRouteChanges(route.Id,route.RouteEndPoint,route.RouteStartPoint)">Save</button></td>
+
+                                                    <td ng-show="managerButtons == 1 && isRouteEditing != route.Id"><button type="button" class="btn btn-danger" ng-click="deleteRoute(route.Id)">Delete</button></td>
+                                                    <td ng-show="managerButtons == 1 && isRouteEditing == route.Id"><button type="button" class="btn btn-danger" ng-click="deleteRoute(route.Id)" disabled>Delete</button></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Modal with the input form for adding a row -->
+                <div class="modal fade" id="addRouteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Active Taxis</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="emptyForm(2)">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <form name="addRouteForm" id="addRouteForm">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <tr>
+                                                        <td>Route Start Point</td>
+                                                        <td>
+                                                            <input type="text" name="addRouteStartPoint" ng-model="startPoint" ng-pattern="/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/"  required>
+                                                            <span ng-show="addRouteForm.addRouteStartPoint.$error.required"><br>Start route is required<br></span>
+                                                            <span ng-show="addRouteForm.addRouteStartPoint.$error.pattern"><br>You have entered an invalid Start Route <br></span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Route End Point</td>
+                                                        <td>
+                                                            <input type="text" name="addRouteEndPoint" ng-model="endPoint" ng-pattern="/^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/"  required>
+                                                            <span ng-show="addRouteForm.addRouteEndPoint.$error.required"><br>End route is required<br></span>
+                                                            <span ng-show="addRouteForm.addRouteEndPoint.$error.pattern"><br>You have entered an invalid End Route <br></span>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" ng-click="addRoute(endPoint,startPoint)" ng-disabled="addRouteForm.$invalid" data-dismiss="modal">Save Route</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="emptyForm(2)">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        </p>
+    </div>
+</div>
